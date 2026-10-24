@@ -1,0 +1,51 @@
+/* 文案转配音：只用 kit.css 的变量，类名统一以 tt- 开头。 */
+.tt-root { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; }
+.tt-main { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
+.tt-text { flex: 1.5 1 420px; min-width: 0; display: flex; flex-direction: column; min-height: 360px; transition: border-color .15s var(--ease), background .15s var(--ease); }
+.tt-text.hover { border-color: var(--primary); background: var(--primary-soft); }
+.tt-opts { flex: 1 1 320px; min-width: 0; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+
+.tt-hd { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.tt-sp { flex: 1; }
+.tt-sm { height: 28px; padding: 0 10px; display: inline-flex; align-items: center; gap: 4px; }
+.tt-table { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 14px; border-bottom: 1px solid var(--line); background: var(--side); font-size: .93em; }
+.tt-col { height: 28px; min-width: 150px; }
+.tt-check { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.tt-area { flex: 1; min-height: 240px; margin: 0; border: 0; border-radius: 0; resize: none; padding: 12px 14px; line-height: 1.75; font-size: 1.02em; background: transparent; }
+.tt-area:focus-visible { outline-offset: -2px; }
+.tt-foot { padding: 8px 14px; border-top: 1px solid var(--line); font-size: .9em; }
+
+.tt-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.tt-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.tt-row { display: flex; align-items: center; gap: 8px; min-width: 0; flex-wrap: wrap; }
+.tt-grow { flex: 1 1 160px; min-width: 0; }
+.tt-range { width: 100%; accent-color: var(--primary); }
+.tt-path { flex: 1 1 120px; min-width: 0; padding: 5px 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--side); font-size: .93em; }
+.tt-hint { font-size: .88em; }
+
+.tt-model { padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+.tt-model-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.tt-badge { display: inline-flex; align-items: center; padding: 0 8px; border-radius: var(--radius-pill); font-size: .86em; font-weight: 600; white-space: nowrap; }
+.tt-badge.ok { background: var(--ok-soft); color: var(--ok); }
+.tt-badge.warn { background: var(--warn-soft); color: var(--warn); }
+
+.tt-go { padding: 12px 14px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.tt-go .k-btn { display: inline-flex; align-items: center; gap: 6px; }
+.tt-prog { flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.tt-msg { padding: 8px 12px; border-radius: var(--radius); font-size: .95em; display: flex; align-items: center; gap: 6px; }
+.tt-msg.ok { background: var(--ok-soft); color: var(--ok); }
+.tt-msg.err { background: var(--err-soft); color: var(--err); }
+
+.tt-res { display: flex; flex-direction: column; overflow: hidden; }
+.tt-list { list-style: none; margin: 0; padding: 6px 10px 10px; display: flex; flex-direction: column; gap: 2px; max-height: 280px; overflow-y: auto; }
+.tt-item { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto auto auto; gap: 10px; align-items: center; padding: 6px 4px; border-bottom: 1px solid var(--line); }
+.tt-item:hover { background: var(--chip); }
+.tt-item.bad { grid-template-columns: 18px minmax(0, 1fr) auto; background: var(--err-soft); color: var(--err); border-radius: var(--radius); }
+.tt-name { min-width: 0; }
+.tt-err { font-size: .92em; }
+.tt-audio { width: 100%; height: 34px; }
+.tt-ai { font-size: .88em; padding: 0 2px 4px; }
+@media (max-width: 720px) { .tt-item { grid-template-columns: 28px minmax(0, 1fr); } .tt-item > :nth-child(n+3) { grid-column: 2; } }
+.tt-root > * { flex-shrink: 0; }
+.tt-text { min-height: 320px; }
+.tt-area { min-height: 200px; }

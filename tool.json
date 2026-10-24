@@ -1,0 +1,17 @@
+{
+  "id": "c10",
+  "slug": "text-to-speech",
+  "name": "文案转配音",
+  "version": "0.1.0",
+  "repo": "campfire-code/text-to-speech",
+  "license": "MIT",
+  "ui": {
+    "layout": "c",
+    "palette": "orange"
+  },
+  "upstream": {
+    "repo": "k2-fsa/sherpa-onnx",
+    "license": "Apache-2.0"
+  },
+  "ffmpeg": true
+}
