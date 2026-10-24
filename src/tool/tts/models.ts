@@ -23,7 +23,7 @@ export interface ModelSpec {
 
 export const KOKORO: ModelSpec = {
   id: 'kokoro-zh-v1.1',
-  label: 'Kokoro v1.1 中英文多音色',
+  label: '中英文多音色语音模型',
   repo: 'csukuangfj/kokoro-multi-lang-v1_1',
   commit: '914313412b607d95400bcd12446233fbd1248801',
   files: [

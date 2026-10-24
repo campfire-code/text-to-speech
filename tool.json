@@ -2,12 +2,13 @@
   "id": "c10",
   "slug": "text-to-speech",
   "name": "文案转配音",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "repo": "campfire-code/text-to-speech",
   "license": "MIT",
   "ui": {
-    "layout": "c",
-    "palette": "orange"
+    "layout": "e",
+    "palette": "orange",
+    "accent": "#C02ABC"
   },
   "upstream": {
     "repo": "k2-fsa/sherpa-onnx",

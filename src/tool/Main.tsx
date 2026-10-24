@@ -1,6 +1,6 @@
 // 主界面：输入 / 导入文案 → 选音色和语速 → 离线合成 → 导出 WAV / MP3 与对齐的 SRT。
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, CheckCircle2, FileSpreadsheet, FolderOpen, Play, Square, Trash2, Volume2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, FileSpreadsheet, FolderOpen, Mic, Play, Square, Trash2, Volume2 } from 'lucide-react';
 import type { CustomTool } from '../kit/types';
 import { ProgressBar, useDroppedFiles } from '../kit/parts';
 import { defaultOutputDir, fileSrc, fs, openFolder, pickFiles, pickFolder, reveal, settingsStore } from '../kit/platform';
@@ -18,6 +18,7 @@ const errText = (e: unknown) => (e instanceof Error ? e.message : String(e));
 const baseName = (p: string) => p.split(/[\\/]/).pop() ?? p;
 const isPreview = typeof location !== 'undefined' && location.pathname.endsWith('preview.html');
 const IMPORT_EXTS = ['txt', 'csv', 'xlsx'];
+// check-zh: 忽略（试听朗读用的中英混读句子，是语音内容不是界面文字）
 const AUDITION = '你好，这是一段试听。Hello, this is a voice test，一二三四五。';
 const VOICES = voiceList();
 
@@ -36,6 +37,19 @@ async function loadPrefs(): Promise<Prefs> {
 }
 async function savePrefs(p: Prefs) {
   try { await (await settingsStore()).set('prefs', p); } catch { /* 存不下不影响使用 */ }
+}
+
+/** 装饰性声波：条形高度由音色编号决定，合成中会起伏 */
+function Wave({ seed, speed, active, n = 56 }: { seed: number; speed: number; active?: boolean; n?: number }) {
+  const bars = useMemo(() => Array.from({ length: n }, (_, i) => {
+    const v = Math.abs(Math.sin((i + 1) * (seed % 7 + 2.3)) * Math.cos(i * 0.31 + seed));
+    return 18 + Math.round(v * 82);
+  }), [seed, n]);
+  return (
+    <div className={`tt-wave${active ? ' on' : ''}`} aria-hidden style={{ ['--dur' as string]: `${(1.4 / speed).toFixed(2)}s` }}>
+      {bars.map((h, i) => <i key={i} style={{ height: `${h}%`, animationDelay: `${(i % 9) * 90}ms` }} />)}
+    </div>
+  );
 }
 
 interface Table { name: string; grid: string[][]; col: number; header: boolean }
@@ -147,6 +161,25 @@ export function Main({ ctx }: { ctx?: Ctx }) {
   return (
     <div className="tt-root">
       <div className="tt-main">
+        <section className={`k-panel tt-stage${busy ? ' live' : ''}`} aria-label="音色与语速">
+          <div className="tt-stage-top">
+            <span className="tt-mic" aria-hidden><Mic size={22} /></span>
+            <div className="tt-voice">
+              <label className="tt-kicker" htmlFor="tt-voice">当前音色</label>
+              <select id="tt-voice" className="tt-voice-sel" value={prefs.sid} disabled={busy} onChange={(e) => setPref('sid', Number(e.target.value))}>
+                {VOICE_GROUPS.map((g) => <optgroup key={g.id} label={`${g.label}（${g.count} 个）`}>{VOICES.filter((v) => v.group === g.id).map((v) => <option key={v.sid} value={v.sid}>{v.label}</option>)}</optgroup>)}
+              </select>
+            </div>
+            <button className="k-btn tt-aud" disabled={busy} onClick={audition} title="用当前音色和语速合成一小段"><Volume2 size={16} aria-hidden />试听</button>
+          </div>
+          <Wave seed={prefs.sid} speed={prefs.speed} active={busy} />
+          <div className="tt-speed">
+            <label className="tt-kicker" htmlFor="tt-speed">语速</label>
+            <input id="tt-speed" className="tt-range" type="range" min={0.6} max={1.6} step={0.05} value={prefs.speed} disabled={busy} onChange={(e) => setPref('speed', Number(e.target.value))} />
+            <b className="tt-speed-n k-num">{prefs.speed.toFixed(2)}×</b>
+          </div>
+        </section>
+
         <section className={`k-panel tt-text${hover ? ' hover' : ''}`}>
           <div className="tt-hd">
             <b>文案</b>
@@ -172,19 +205,6 @@ export function Main({ ctx }: { ctx?: Ctx }) {
         </section>
 
         <section className="k-panel tt-opts">
-          <div className="tt-field">
-            <label className="k-label" htmlFor="tt-voice">音色</label>
-            <div className="tt-row">
-              <select id="tt-voice" className="k-input tt-grow" value={prefs.sid} disabled={busy} onChange={(e) => setPref('sid', Number(e.target.value))}>
-                {VOICE_GROUPS.map((g) => <optgroup key={g.id} label={`${g.label}（${g.count} 个）`}>{VOICES.filter((v) => v.group === g.id).map((v) => <option key={v.sid} value={v.sid}>{v.label}</option>)}</optgroup>)}
-              </select>
-              <button className="k-btn tt-sm" disabled={busy} onClick={audition} title="用当前音色和语速合成一小段"><Volume2 size={14} aria-hidden />试听</button>
-            </div>
-          </div>
-          <div className="tt-field">
-            <label className="k-label" htmlFor="tt-speed">语速 <b className="k-num">{prefs.speed.toFixed(2)}×</b></label>
-            <input id="tt-speed" className="tt-range" type="range" min={0.6} max={1.6} step={0.05} value={prefs.speed} disabled={busy} onChange={(e) => setPref('speed', Number(e.target.value))} />
-          </div>
           <div className="tt-pair">
             <div className="tt-field"><span className="k-label">格式</span>
               <span className="k-seg" role="group" aria-label="输出格式">
@@ -234,7 +254,7 @@ export function Main({ ctx }: { ctx?: Ctx }) {
           <span className={`tt-badge ${model === 'missing' ? 'warn' : 'ok'}`}>{modelText}</span>
         </div>
         <div className="tt-row">
-          <span className="k-muted tt-hint">模型许可证 Apache-2.0。下载后保存在本机，合成全程离线。下载不了可手动下载同名文件并指定文件夹。</span>
+          <span className="k-muted tt-hint">模型采用开放授权协议，商用前请阅读其条款。下载后保存在本机，合成全程离线。下载不了可手动下载同名文件并指定文件夹。</span>
           <button className="k-btn tt-sm" disabled={busy} onClick={async () => { const d = await pickFolder(); if (d) setPref('localDir', d); }}><FolderOpen size={14} aria-hidden />指定本地模型文件夹…</button>
           {prefs.localDir && <button className="k-btn tt-sm" disabled={busy} onClick={() => setPref('localDir', '')} title={prefs.localDir}>改回自动下载</button>}
         </div>
@@ -255,7 +275,7 @@ export function Main({ ctx }: { ctx?: Ctx }) {
       {(files.length > 0 || failed.length > 0) && (
         <section className="k-panel tt-res">
           <div className="tt-hd">
-            <b>结果</b>
+            <b>成品</b>
             <span className="k-muted k-num">{files.length} 个文件</span>
             <span className="tt-sp" />
             {dir && <button className="k-btn tt-sm" onClick={() => void openFolder(dir)}><FolderOpen size={14} aria-hidden />打开文件夹</button>}
@@ -265,6 +285,7 @@ export function Main({ ctx }: { ctx?: Ctx }) {
               <li key={f.path} className="tt-item">
                 <button className="k-icon-btn" aria-label={`播放 ${f.name}`} title="播放" onClick={() => play(f.path)}><Play size={14} /></button>
                 <span className="tt-name k-ellipsis" title={f.path}>{f.name}</span>
+                <Wave seed={f.name.length + f.entries[0]} speed={1} n={22} />
                 <span className="k-muted k-num">{fmtDuration(f.seconds)}</span>
                 <span className="k-muted">{f.entries.length > 1 ? `${f.entries.length} 条` : ''}{f.srtPath ? ' · 含 SRT' : ''}</span>
                 <button className="k-btn tt-sm" onClick={() => void reveal(f.path).catch(() => {})}>在文件夹中显示</button>
@@ -281,7 +302,7 @@ export function Main({ ctx }: { ctx?: Ctx }) {
         </section>
       )}
       <audio ref={audio} className="tt-audio" controls aria-label="试听播放器" />
-      <div className="tt-ai k-muted">合成的配音属于 AI 合成内容。用于商业发布时，请遵守所用模型的许可证（Kokoro 为 Apache-2.0）和发布平台对 AI 合成内容的标识要求。</div>
+      <div className="tt-ai k-muted">合成的配音属于 AI 合成内容。用于商业发布时，请遵守所用语音模型的授权协议和发布平台对 AI 合成内容的标识要求。</div>
     </div>
   );
 }

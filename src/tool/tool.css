@@ -1,15 +1,15 @@
 /* 文案转配音：只用 kit.css 的变量，类名统一以 tt- 开头。 */
 .tt-root { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; }
-.tt-main { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
-.tt-text { flex: 1.5 1 420px; min-width: 0; display: flex; flex-direction: column; min-height: 360px; transition: border-color .15s var(--ease), background .15s var(--ease); }
+.tt-main { display: flex; flex-direction: column; gap: 14px; }
+.tt-text { min-width: 0; display: flex; flex-direction: column; min-height: 360px; transition: border-color .15s var(--ease), background .15s var(--ease); }
 .tt-text.hover { border-color: var(--primary); background: var(--primary-soft); }
-.tt-opts { flex: 1 1 320px; min-width: 0; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+.tt-opts { min-width: 0; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
 
 .tt-hd { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid var(--line); }
 .tt-sp { flex: 1; }
-.tt-sm { height: 28px; padding: 0 10px; display: inline-flex; align-items: center; gap: 4px; }
+.tt-sm { height: 32px; padding: 0 10px; display: inline-flex; align-items: center; gap: 4px; }
 .tt-table { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 14px; border-bottom: 1px solid var(--line); background: var(--side); font-size: .93em; }
-.tt-col { height: 28px; min-width: 150px; }
+.tt-col { height: 32px; min-width: 150px; }
 .tt-check { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
 .tt-area { flex: 1; min-height: 240px; margin: 0; border: 0; border-radius: 0; resize: none; padding: 12px 14px; line-height: 1.75; font-size: 1.02em; background: transparent; }
 .tt-area:focus-visible { outline-offset: -2px; }
@@ -38,14 +38,33 @@
 
 .tt-res { display: flex; flex-direction: column; overflow: hidden; }
 .tt-list { list-style: none; margin: 0; padding: 6px 10px 10px; display: flex; flex-direction: column; gap: 2px; max-height: 280px; overflow-y: auto; }
-.tt-item { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto auto auto; gap: 10px; align-items: center; padding: 6px 4px; border-bottom: 1px solid var(--line); }
+.tt-item { display: grid; grid-template-columns: 32px minmax(0, 1fr) 88px auto auto auto; gap: 10px; align-items: center; padding: 6px 4px; border-bottom: 1px solid var(--line); }
 .tt-item:hover { background: var(--chip); }
 .tt-item.bad { grid-template-columns: 18px minmax(0, 1fr) auto; background: var(--err-soft); color: var(--err); border-radius: var(--radius); }
 .tt-name { min-width: 0; }
 .tt-err { font-size: .92em; }
 .tt-audio { width: 100%; height: 34px; }
 .tt-ai { font-size: .88em; padding: 0 2px 4px; }
-@media (max-width: 720px) { .tt-item { grid-template-columns: 28px minmax(0, 1fr); } .tt-item > :nth-child(n+3) { grid-column: 2; } }
+@media (max-width: 560px) { .tt-item { grid-template-columns: 32px minmax(0, 1fr); } .tt-item > :nth-child(n+3) { grid-column: 2; } }
 .tt-root > * { flex-shrink: 0; }
 .tt-text { min-height: 320px; }
 .tt-area { min-height: 200px; }
+
+/* ---- 录音棚：音色与语速 ---- */
+.tt-stage { padding: 16px 18px 14px; display: flex; flex-direction: column; gap: 12px; border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--primary-soft), var(--surface) 78%); border-color: color-mix(in srgb, var(--primary) 30%, var(--line)); }
+.tt-stage-top { display: flex; align-items: center; gap: 14px; }
+.tt-mic { flex: none; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--primary); color: var(--on-primary); }
+.tt-voice { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.tt-kicker { font-size: .86em; color: var(--muted); font-weight: 500; }
+.tt-voice-sel { width: 100%; min-height: 36px; border: 0; background: transparent; font-size: 1.45em; font-weight: 700; padding: 0; cursor: pointer; text-overflow: ellipsis; }
+.tt-voice-sel:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 6px; }
+.tt-aud { height: 40px; padding: 0 18px; }
+.tt-wave { height: 56px; display: flex; align-items: center; gap: 3px; }
+.tt-wave i { flex: 1; min-width: 2px; border-radius: 2px; background: var(--primary); opacity: .55; transform-origin: center; }
+.tt-wave.on i { opacity: .9; animation: tt-bounce var(--dur, 1.4s) ease-in-out infinite alternate; }
+@keyframes tt-bounce { from { transform: scaleY(.35); } to { transform: scaleY(1); } }
+.tt-speed { display: flex; align-items: center; gap: 12px; }
+.tt-speed .tt-range { flex: 1; }
+.tt-speed-n { min-width: 52px; text-align: right; font-size: 1.1em; }
+.tt-item .tt-wave { height: 22px; gap: 2px; }
+.tt-item .tt-wave i { opacity: .7; }
